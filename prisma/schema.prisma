@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model users {
+  id                        String        @id @default(uuid())
+  name                      String
+  email                     String        @unique
+  password                  String
+  admin                     Boolean       @default(false)
+  created_at                DateTime      @default(now())
+  updated_at                DateTime      @default(now()) @updatedAt
+  compliments_user_sender   compliments[] @relation(name: "user_sender")
+  compliments_user_receiver compliments[] @relation(name: "user_receiver")
+
+}
+
+model tags {
+  id          String        @id @default(uuid())
+  name        String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @default(now()) @updatedAt
+  compliments compliments[]
+}
+
+model compliments {
+  id                           String   @id @default(uuid())
+  user_sender                  String
+  user_receiver                String
+  tag_id                       String
+  message                      String
+  created_at                   DateTime @default(now())
+  fk_user_sender_compliments   users    @relation("user_sender", fields: [user_sender], references: [id])
+  fk_user_receiver_complimnets users    @relation("user_receiver", fields: [user_receiver], references: [id])
+  fk_tag_id                    tags     @relation(fields: [tag_id], references: [id])
+
+}
